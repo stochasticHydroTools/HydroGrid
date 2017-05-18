@@ -1,0 +1,30 @@
+&hydroAnalysisOptions ! Anton's analysis code!
+   ! Means file: column 1=y, 2=rho, 3=v_x, 4=v_y, 5=T, 6=c
+   storeConserved = F ! Leave at F
+   writeMeansVTK = T ! Write the means to a VTK file
+
+   ! Variances
+   writeVariancesVTK = T ! Should we save a VTK file
+   nVariances = 4 ! How many co-variances to calculate and save
+   ! 1=vx-vx, 2=vy-vy, 3=vx-vy, 4=rho-rho, 5=rho-vx
+   variancePairs = "0 2 0 2, 0 3 0 3, 0 2 0 3, 0 1 0 1, 0 1 0 2"
+      ! species1 variable1 species2 variable2
+   
+   ! Static structure factors
+   writeSpectrumVTK = T
+   writeAbsValue = T ! Only write absolute values of complex values to VTK file?
+   nStructureFactors = 4
+   ! 1=vx-vx, 2=vy-vy, 3=vx-vy, 4=rho-rho, 5=rho-vx
+   structureFactorPairs = "0 2 0 2, 0 3 0 3, 0 2 0 3, 0 1 0 1, 0 1 0 2"
+   vectorStructureFactor = "T T F F F" ! For grouping into a tensor
+   
+   ! Dynamic structure factors:
+   nWavenumbers=0
+   ! Shape (3,nWavenumbers):
+   selectedWavenumbers=""   
+   nSavedSnapshots=1000
+   
+   outputFolder = "./"
+   filePrefix = "Example" ! Prefix for all file names
+   axisToPrint = 2 ! 1=x, 2=y, 3=z axis
+/

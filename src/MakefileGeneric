@@ -1,0 +1,64 @@
+# HydroGrid make rules:
+#--------------------------
+
+# Look for sources in the repository:
+vpath %.cpp $(SRC_HYDROLIB)
+vpath %.H $(SRC_HYDROLIB)
+vpath %.c $(SRC_HYDROLIB)
+vpath %.h $(SRC_HYDROLIB)
+vpath %.f90 $(SRC_HYDROLIB)
+
+# From HydroGrid library:
+CHEADERS += RNGs.h visit_writer.h HydroGrid.h
+CSOURCES += RNGs.c visit_writer.c
+FSOURCES += Precision.f90 RNG.f90 Random.f90 NURNGs.f90 FFTW.f90 VisitWriter.f90 HydroGridModule.f90 HydroGridCInterface.f90
+
+OBJECTS=$(CSOURCES:.c=.o) $(FSOURCES:.f90=.o) 
+
+LIBOBJECTS = Precision.o FFTW.o VisitWriter.o HydroGridModule.o HydroGridCInterface.o visit_writer.o
+
+EXECUTABLES = 
+
+all: $(EXECUTABLES) libHydroAnalysis.a
+
+clean:
+	rm -rf *.o *.mod $(EXECUTABLES)
+
+libHydroAnalysis.a: $(LIBOBJECTS)
+	ar rcs libHydroAnalysis.a $(LIBOBJECTS)
+
+Precision.o: Precision.f90
+	$(FC) -c $<
+
+Random.o: Random.f90 Precision.o
+	$(FC) -c $<
+
+NURNGs.o: NURNGs.f90
+	$(FC) -c $<
+
+RNG.o: RNG.f90 Random.o NURNGs.o
+	$(FC) -c $<
+
+RNGs.o: RNGs.c
+	$(CC) -c -DBL_FORT_USE_UNDERSCORE $<
+
+SeedRNGs.o: SeedRNGs.cpp RNGs.h
+	$(CPPC) -I $(MPIINC) -c $<
+                        
+visit_writer.o: visit_writer.c
+	$(CC) -c $<
+
+FFTW.o: FFTW.f90 Precision.o
+	$(FC) -c $<
+
+VisitWriter.o: VisitWriter.f90
+	$(FC) -c $<
+
+HydroGridModule.o: HydroGridModule.f90 FFTW.o VisitWriter.o
+	$(FC) -c $<
+
+HydroGridCInterface.o: HydroGridCInterface.f90 HydroGridModule.o
+	$(FC) -c $<
+
+TestHydroGrid.o: TestHydroGrid.c HydroGrid.h RNGs.h 
+	$(CC) -c $<
