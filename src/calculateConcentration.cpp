@@ -80,8 +80,6 @@ void calculateConcentration(string outputname,
   static double dx, dy, inverse_volume_cell;
   static double *y_init, *c, *density;
 
-  cout << "calculateConcentration = " << init << endl;
-
   if(init == 0){
     // Init function
     init = 1;

@@ -23,7 +23,7 @@ EXECUTABLES =
 all: $(EXECUTABLES) libHydroAnalysis.a calculateConcentration.so
 
 clean:
-	rm -rf *.o *.mod lib*.a $(EXECUTABLES)
+	rm -rf *.o *.mod lib*.a *.so $(EXECUTABLES)
 
 libHydroAnalysis.a: $(LIBOBJECTS)
 	ar rcs libHydroAnalysis.a $(LIBOBJECTS)

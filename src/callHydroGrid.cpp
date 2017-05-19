@@ -34,17 +34,12 @@ bool callHydroGrid(const int option,
                    const double dt,
                    const int step){
 
-  cout << "callHydroGrid " << 0 << endl;
   // Define variables
   static int nCells[3];
   static double systemLength[3];
   static double heatCapacity[1];
 
-  cout << "callHydroGrid " << 1 << endl;
-  // static double *v = new double [mx*my * 3];
-
   if(option == 0){
-    cout << "callHydroGrid " << 2 << endl;
     ifstream fileinput ("hydroGridOptions.nml");
     string word, wordfile;
     while(!fileinput.eof()){
