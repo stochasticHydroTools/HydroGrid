@@ -1,46 +1,48 @@
-SRC_HYDROLIB=../HydroGrid
-
-# Note: We have to use gfortran>4.4 since we are using Fortran-C interop
+# Note that option -fPIC is important for python linking
 
 # C/C++ compiler:
-CCOMP=gcc       # gcc44
-CC=$(CCOMP) -fPIC    #-g
-CPPC=$(CCOMP)   #-g
-CXX=g++
-CXXFLAGS = -O3 
-CXXINCLS = -I./  
+#------------------
+
+# Choose optimization:
+COPT=-g
+#COPT=-O3
+
+CCOMP=gcc $(COPT) -fPIC
+CC=$(CCOMP)
+CPPC=$(CCOMP)
+CXX=g++ $(COPT)  
 
 # Fortran compiler:
-
-# GNU:
-FCOMP=gfortran # gfortran44
-FC_O=$(FCOMP) -O -Wall -ffree-line-length-none  # Optimized
-FC_g=$(FCOMP) -g -fbounds-check -Wall -ffree-line-length-none # Debugging
-# FC_C=$(FC)     # Mixed language linking is more complicated
-
-# Intel:
-# FC_O=ifort -g -traceback -O # Intel basic optimization but annotated for profiling
-# FC_O=ifort -O3 -ip -mp1 -fltconsistency # -traceback  -g # The same flags as with Parallel.f90
-# FC_g=ifort -g -traceback -check bounds -check uninit -fpe1 # Debugging
-# FC_C=$(FC) -nofor-main # Mixed language linking is more complicated
+# Note: We have to use gfortran>4.4 since we are using Fortran-C interop
+#------------------
+OPTIONS=-fPIC -ffree-line-length-none -Wall -Wno-unused
+FCOMP=gfortran
+FC_O=$(FCOMP) -O $(OPTIONS) # Optimized
+FC_g=$(FCOMP) -g -fbounds-check $(OPTIONS) # Debugging
+FC_C=$(FC) # Mixed language linking is more complicated
 
 # Choose level of optimization:
-FC=$(FC_O) -fPIC # Optimized
-# FC=$(FC_g) # Debugging
+#FC=$(FC_O) # Optimized
+FC=$(FC_g) # Debugging
 
 # For linking the right libraries in:
 LIBRARIES = -L/usr/lib64/
 # LIBRARIES += -lgsl -lgslcblas # If using the GSL
 LIBRARIES += -lfftw3 -lfftw3f -lm -lgfortran -fPIC
 
+#------------------
+# Python
 
 # Set Python version
 PYTHON_VERSION = 2.7
-# PYTHON_INCLUDE = /usr/include/python$(PYTHON_VERSION)
-PYTHON_INCLUDE = /usr/local/pkg/python/$(PYTHON_VERSION)/include/python$(PYTHON_VERSION)
-PYTHON_LIB = /usr/local/pkg/python/$(PYTHON_VERSION)/lib/python$(PYTHON_VERSION)/config/
+#PYTHON_INCLUDE = /usr/include/python$(PYTHON_VERSION)
+# RedHat:
+#PYTHON_DIR = /usr/local/pkg/python/$(PYTHON_VERSION)
+# CentOs:
+PYTHON_DIR = /usr/local/stow/python-$(PYTHON_VERSION)
+PYTHON_INCLUDE = $(PYTHON_DIR)/include/python$(PYTHON_VERSION)
+PYTHON_LIB = $(PYTHON_DIR)/lib/python$(PYTHON_VERSION)/config/
 
 # location of the Boost Python include files and library
 BOOST_INC = /usr/include/boost
 BOOST_LIB = /usr/lib64/boost
-

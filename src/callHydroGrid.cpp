@@ -37,7 +37,6 @@ bool callHydroGrid(const int option,
   // Define variables
   static int nCells[3];
   static double systemLength[3];
-  static double heatCapacity[1];
 
   if(option == 0){
     ifstream fileinput ("hydroGridOptions.nml");
@@ -63,13 +62,14 @@ bool callHydroGrid(const int option,
                           2 /*nVelocityDimensions*/,
                           1 /*isSingleFluid*/,
                           systemLength,
-                          heatCapacity /*heatCapacity*/,
+                          NULL /*heatCapacity*/,
                           dt /*time step*/,
                           0 /*nPassiveScalars*/,
                           1 /*structFactMultiplier*/,
-                          0 /*project2D*/);
+                          1 /*project2D*/);
   }
   else if(option == 1){
+    //std::cout << "Updating hydro grid" << std::endl;
     updateHydroAnalysisMixture_C(NULL /*velocities*/, density /*densities*/, c /*concentrations*/);
   }
   else if(option == 2){

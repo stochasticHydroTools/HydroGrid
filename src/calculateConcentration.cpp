@@ -63,34 +63,29 @@ bool callHydroGrid(const int option,
                    const int step);
 
 void calculateConcentration(string outputname,
-                            double lx, 
-                            double ly, 
-                            double ly_green_start,
-                            double ly_green_end,
-                            int mx,
-                            int my,
-                            int step,
-                            double dt,
-                            int np,
-                            int option,
-                            bp::numeric::array r_vectors){
+                            double lx, // Domain x length
+                            double ly, // Domain y length
+                            int green_start, // Start of "green" particles
+                            int green_end, // End of "green" particles
+                            int mx, // Grid size x
+                            int my, // Grid size y
+                            int step, // Step of simulation
+                            double dt, // Time interval between successive snapshots (calls to updateHydroGrid)
+                            int np, // Number of particles
+                            int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (finalize)
+                            double *x_array, double *y_array){
   
-  // string outputname = "hola";
-  static int init = 0;
   static double dx, dy, inverse_volume_cell;
-  static double *y_init, *c, *density;
+  static double *c, *density;
 
-  if(init == 0){
-    // Init function
-    init = 1;
-    dx = lx / mx;
-    dy = ly / my;
-    inverse_volume_cell = 1.0 / (dx * dy);
-    y_init = new double [np];
-    c = new double [mx*my*2];
-    density = new double [mx*my];
+  dx = lx / mx;
+  dy = ly / my;
+  inverse_volume_cell = 1.0 / (dx * dy);
   
-    // Initialize HydroGrid
+  c = new double [mx*my*2];
+  density = new double [mx*my];
+      
+  if(option == 0) { // Initialize HydroGrid
     callHydroGrid(0,
                   outputname,
                   c,
@@ -100,18 +95,10 @@ void calculateConcentration(string outputname,
                   lx,
                   ly,
                   dt,
-                  step);
-    
-    // Save initial y-coordinate
-    for(int i=0;i<np;i++){
-      bp::numeric::array r_vector_1 = bp::extract<bp::numeric::array>(r_vectors[i]);
-      y_init[i] = bp::extract<double>(r_vector_1[1]);     
-      y_init[i] = y_init[i] - (int(y_init[i] / ly + 0.5*((y_init[i]>0)-(y_init[i]<0)))) * ly;
-    }
+                  step);  
   }
-
-
-  if(option == 0){ // Update hydrogrid data
+  else if(option == 1){ // Update hydrogrid data
+    
     // Set concentration to zero
     for(int i=0; i < mx*my; i++){
       c[i] = 0;  
@@ -122,9 +109,9 @@ void calculateConcentration(string outputname,
     // Loop over particles and save as concentration
     for(int i=0;i<np;i++){
       // Extract data
-      bp::numeric::array r_vector_1 = bp::extract<bp::numeric::array>(r_vectors[i]);
-      double x = bp::extract<double>(r_vector_1[0]);     
-      double y = bp::extract<double>(r_vector_1[1]);     
+      
+      double x = x_array[i];     
+      double y = y_array[i];     
       
       // Use PBC
       x = x - (int(x / lx + 0.5*((x>0)-(x<0)))) * lx;
@@ -136,11 +123,11 @@ void calculateConcentration(string outputname,
       int icel = jx + jy * mx;
 
       // Is particle green or red
-      if((y_init[i] < ly_green_start) or (y_init[i] > ly_green_end)){ // Particle is red
-        c[mx*my+icel] += 1.0;
-      }
-      else{ // Particle is green
+      if((i>=green_start)&&(i<=green_end)) { // Particle is green
         c[icel] += 1.0;
+      }
+      else{ // Particle is red
+        c[mx*my+icel] += 1.0;
       }
       density[icel] += 1.0;
     }
@@ -164,7 +151,7 @@ void calculateConcentration(string outputname,
                   dt,
                   step);  
   }
-  else if(option == 1){ // Call HydroGrid to print data
+  else if(option == 2){ // Call HydroGrid to print data
     callHydroGrid(3,
                   outputname,
                   c,
@@ -176,7 +163,7 @@ void calculateConcentration(string outputname,
                   dt,
                   step);  
   }  
-  else if(option == 2){ // Call HydroGrid to print final data and free memory
+  else if(option == 3){ // Call HydroGrid to print final data and free memory
     // Free HydroGrid
     callHydroGrid(2,
                   outputname,
@@ -189,18 +176,51 @@ void calculateConcentration(string outputname,
                   dt,
                   step);
 
-    // Free memory
-    delete[] c;
-    delete[] density;
-    delete[] y_init;
   }
+
+  // Free memory
+  delete[] c;
+  delete[] density;
+
 }
 
+void calculateConcentrationPython(string outputname,
+                            double lx, 
+                            double ly, 
+                            int green_start,
+                            int green_end,
+                            int mx,
+                            int my,
+                            int step,
+                            double dt,
+                            int np,
+                            int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (finalize)
+                            bp::numeric::array r_vectors) // Should be an Nx3 numpy array
+{
 
+   double* x = new double [np];
+   double* y = new double [np];
+   
+   for(int i=0;i<np;i++){
+      // Extract data
+      bp::numeric::array r_vector_1 = bp::extract<bp::numeric::array>(r_vectors[i]);
+      x[i] = bp::extract<double>(r_vector_1[0]);     
+      y[i] = bp::extract<double>(r_vector_1[1]);     
+  
+  }    
+         
+   calculateConcentration(outputname, lx, ly, 
+                            green_start, green_end, mx, my, step,
+                            dt, np, option, x, y);
+                            
+   delete[] x;
+   delete[] y;                            
+                            
+}
 
 BOOST_PYTHON_MODULE(calculateConcentration)
 {
   using namespace boost::python;
   boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
-  def("calculate_concentration", calculateConcentration);
+  def("calculate_concentration", calculateConcentrationPython);
 }

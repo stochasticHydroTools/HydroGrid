@@ -64,14 +64,14 @@ HydroGridCInterface.o: HydroGridCInterface.f90 HydroGridModule.o
 TestHydroGrid.o: TestHydroGrid.c HydroGrid.h RNGs.h 
 	$(CC) -c $<
 
-calculateConcentration.o: calculateConcentration.cpp ; \
- $(CXX) -O3 -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c calculateConcentration.cpp
+calculateConcentration.o: calculateConcentration.cpp
+	$(CXX) -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c $<
 
-callHydroGrid.o: callHydroGrid.cpp ; \
- $(CXX) -O3 -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c callHydroGrid.cpp
+callHydroGrid.o: callHydroGrid.cpp
+	$(CXX) -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c $<
 
-# libCallHydroGrid.a: callHydroGrid.o calculateConcentration.o
-#	ar rcs libCallHydroGrid.a callHydroGrid.o calculateConcentration.o
+libCallHydroGrid.a: callHydroGrid.o calculateConcentration.o
+	ar rcs libCallHydroGrid.a callHydroGrid.o calculateConcentration.o
 
 calculateConcentration.so: calculateConcentration.o callHydroGrid.o libHydroAnalysis.a
 	$(CXX) -shared -dynamiclib -O3 calculateConcentration.o callHydroGrid.o -L$(BOOST_LIB) -lboost_python -L$(PYTHON_LIB) -lpython$(PYTHON_VERSION) -L./ -lHydroAnalysis -lgfortran -lfftw3 -lfftw3f -o calculateConcentration.so
