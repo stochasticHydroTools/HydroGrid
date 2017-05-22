@@ -52,6 +52,9 @@ HydroGrid numbers the different variables and can compute spectra of one variabl
 where rho here means number density of particles. So for us relevant variables are:
 1=rho, 5=rho_green and 6=rho_red
 
+
+
+
 ==================================
 Static Structure Factors
 ==================================
