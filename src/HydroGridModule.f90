@@ -1196,7 +1196,7 @@ subroutine updateStructureFactors(grid)
                grid%savedStructureFactors(1:grid%nSavedRawSnapshots, iWavenumber, iVariable)
             ! For the second half, invert the time so the result is periodic:
             grid%dynamicFFTarray(grid%nSavedRawSnapshots+1 : 2*grid%nSavedRawSnapshots-2) = &
-               grid%savedStructureFactors(grid%nSavedRawSnapshots-1:2:-1, iWavenumber, iVariable)
+               grid%savedStructureFactors(grid%nSavedRawSnapshots-1:2:-1, iWavenumber, iVariable)               
             call FFTW_Execute(grid%dynamicFFTplan)
             grid%savedStructureFactors(:, iWavenumber, iVariable) = grid%dynamicFFTarray ! Use this as temporary storage
 
