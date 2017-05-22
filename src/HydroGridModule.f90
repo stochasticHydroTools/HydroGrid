@@ -1176,8 +1176,11 @@ subroutine updateStructureFactors(grid)
          grid%savedStructureFactors(grid%iSample, iWavenumber, iVariable) = grid%staticFourierTransforms(kx, ky, kz, iVariable)
       end do
    end do
+   
+   !write(*,*) "iStep=", grid%iStep, " sample=", grid%iSample, " series=", grid%iTimeSeries
 
    if (grid%iSample >= abs(grid%nSavedRawSnapshots)) then ! Memory of past history is full, do temporal FFT now
+      !write(*,*) "Computing time-correlation functions using FFTs every ", grid%nSavedRawSnapshots 
 
       if(writeSpectrumHistory) then ! Save a history of S(k)
          
