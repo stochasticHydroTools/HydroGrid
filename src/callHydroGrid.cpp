@@ -3,25 +3,12 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
-// #include "visit_writer.h"
-// #include "visit_writer.c"
 using namespace std;
 
 
 extern "C" {
 #include "HydroGrid.h"
 }
-
-
-
-/*int main(int argc, char* argv[]){
-
-
-
-
-  cout << "# End" << endl;
-  }*/
-
 
 bool callHydroGrid(const int option,
                    const string outputname,
@@ -69,7 +56,6 @@ bool callHydroGrid(const int option,
                           1 /*project2D*/);
   }
   else if(option == 1){
-    //std::cout << "Updating hydro grid" << std::endl;
     updateHydroAnalysisMixture_C(NULL /*velocities*/, density /*densities*/, c /*concentrations*/);
   }
   else if(option == 2){

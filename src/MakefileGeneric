@@ -20,7 +20,7 @@ LIBOBJECTS = Precision.o FFTW.o VisitWriter.o HydroGridModule.o HydroGridCInterf
 
 EXECUTABLES = 
 
-all: $(EXECUTABLES) libHydroAnalysis.a calculateConcentration.so
+all: $(EXECUTABLES) libHydroAnalysis.a calculateConcentration.so libCallHydroGrid.a
 
 clean:
 	rm -rf *.o *.mod lib*.a *.so $(EXECUTABLES)
@@ -70,11 +70,9 @@ calculateConcentration.o: calculateConcentration.cpp
 callHydroGrid.o: callHydroGrid.cpp
 	$(CXX) -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c $<
 
-libCallHydroGrid.a: callHydroGrid.o calculateConcentration.o
+libCallHydroGrid.a: callHydroGrid.o calculateConcentration.o 
 	ar rcs libCallHydroGrid.a callHydroGrid.o calculateConcentration.o
 
 calculateConcentration.so: calculateConcentration.o callHydroGrid.o libHydroAnalysis.a
 	$(CXX) -shared -dynamiclib -O3 calculateConcentration.o callHydroGrid.o -L$(BOOST_LIB) -lboost_python -L$(PYTHON_LIB) -lpython$(PYTHON_VERSION) -L./ -lHydroAnalysis -lgfortran -lfftw3 -lfftw3f -o calculateConcentration.so
 
-
-# -L./ -llibHydroAnalysis
