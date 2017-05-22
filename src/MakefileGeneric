@@ -74,5 +74,5 @@ libCallHydroGrid.a: callHydroGrid.o calculateConcentration.o
 	ar rcs libCallHydroGrid.a callHydroGrid.o calculateConcentration.o
 
 calculateConcentration.so: calculateConcentration.o callHydroGrid.o libHydroAnalysis.a
-	$(CXX) -shared -dynamiclib -O3 calculateConcentration.o callHydroGrid.o -L$(BOOST_LIB) -lboost_python -L$(PYTHON_LIB) -lpython$(PYTHON_VERSION) -L./ -lHydroAnalysis -lgfortran -lfftw3 -lfftw3f -o calculateConcentration.so
+	$(CXX) -shared -dynamiclib -O3 calculateConcentration.o callHydroGrid.o -L$(BOOST_LIB) -lboost_python -L$(PYTHON_LIB) -lpython$(PYTHON_VERSION) -L./ -lHydroAnalysis $(LIBRARIES) -o calculateConcentration.so
 
