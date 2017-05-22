@@ -1,16 +1,16 @@
-# HydroGrid
-Dynamic and static structure factors in fluid mixtures
+# HydroGrid library for computing static and dynamic structure factors (spectra)
 
-==================================
-USAGE
-==================================
 
-cd example
-# Edit MakefileHeader to edit compilers/paths/etc
-make
-# Nedit hydroGridOptions.nml where all options for HydroGrid are set
-# Run and study the example:
-python brownian_walkers.py
+## Usage
+
+First try to run the python example of diffusion in a binary mixture of uncorrelated Brownian walkers, which is in the folder/directory example.
+
+* cd example
+* cp ../src/MakefileHeader .
+* Edit MakefileHeader to edit compilers/paths/etc
+* make
+* Edit hydroGridOptions.nml where all options for HydroGrid are set, and then run
+* python brownian_walkers.py
 
 In this example we have 
   num_particles = 1024*16
