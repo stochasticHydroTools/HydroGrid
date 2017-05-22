@@ -133,7 +133,7 @@ and the largest is
 
 t_max=2*nSavedSnapshots*dtime
 
-# Wavenumber selection
+### Wavenumber selection
 
 To select how many wavenumbers to compute dynamic factors for, use the input nWavenumbers in the namelist. If this is set to zero, dynamic factors won't be computed. If set to a positive number, then you need to give an explicit list of the wavenumbers you want to track, for example:
 
