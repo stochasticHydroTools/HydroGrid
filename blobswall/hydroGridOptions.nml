@@ -58,7 +58,7 @@
    
    ! Dynamic structure factors:
    nWavenumbers=-1
-   selectedWavenumbers="1 32, 0 0" ! Compute S(k,w) for kx=1:16
+   selectedWavenumbers="1 16, 0 0" ! Compute S(k,w) for kx=1:16
    nSavedSnapshots=2500 ! How many snapshots to compute time-correlation functions over
    
    outputFolder = "./data"
