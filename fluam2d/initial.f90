@@ -1,10 +1,11 @@
 program initial
-  integer, parameter :: n=32000, ng=32000/3
+  integer, parameter :: n=32000
+  integer, parameter :: ng=n/3
   integer :: p
   real :: x, y, Lx, Ly
   
   Lx=453.74818583181210299
-  Ly=453.74818583181210299
+  Ly=Lx
   
   write(*,*) n
   do p=1,n

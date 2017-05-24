@@ -1,0 +1,41 @@
+1. Get code:
+
+git clone git@github.com:stochasticHydroTools/RigidMultiblobsWall
+
+or git pull and fetch branches
+git fetch --all
+if already checked out
+
+Look at README.md for extensive documentation
+
+3. Checkout branch hydro
+git checkout hydro
+
+4. Add correct path to HydroGrid and to the directory RigidMultiblobsWall in the file
+
+RigidMultiblobsWall/multi_bodies/multi_bodies.py
+
+For example:
+
+sys.path.append('../../RigidMultiblobsWall/')
+sys.path.append('../')
+
+if you run inside HydroGrid/blobswall, or
+
+sys.path.append('../')
+sys.path.append('../../RigidMultiblobsWall/')
+
+if you run inside RigidMultiblobsWall/multi_bodies
+
+5. Compile HydroGrid to obtain calculateConcentration.so in python path
+
+6. cd HydroGrid/blobswall
+
+7. Create initial configuration with the utility code initial.f90
+
+gfortran -o initial.x initial.f90
+
+./initial.x > data/initial.dat
+
+8. Run code
+python ../RigidMultiblobsWall/multi_bodies/multi_bodies.py --input-file inputfile_hydroGrid.dat 
