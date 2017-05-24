@@ -2,4 +2,4 @@
 SRC_HYDROLIB=../src
 
 include MakefileHeader
-include ../src/MakefileGeneric
+include $(SRC_HYDROLIB)/MakefileGeneric
