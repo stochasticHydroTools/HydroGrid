@@ -2,6 +2,8 @@
 #scheme                                                          stochastic_first_order_rollers
 scheme					                         stochastic_adams_bashforth_rollers
 #scheme					                         stochastic_first_order_RFD
+# Keep this set to True:
+free_kinematics      True 
 
 # Set the implementation to compute the block-diagonal matrix for the preconditioner
 # Note: This option is  not used for single blobs as in this example
@@ -42,8 +44,8 @@ debye_length_wall	   		                 5.0
 # Set time step, number of steps and save frequency for particle configurations
 # To figure out right time step, compute histogram of z positions and compare to Gibbs-Boltzmann ??? FLOREN any better ideas?
 dt		 	   	     	                       0.016
-n_steps					                         20
-n_save  				                         5
+n_steps					                         500
+n_save  				                         50
 
 # Set numer of initialization/equilibration steps: code saves not data for steps < initial_step
 initial_step				                     0
