@@ -23,9 +23,8 @@ rf_delta  3e-3
 # Use implementation=pycuda for GPU-based, None for ideal particles, or C++ for CPU-based
 blob_blob_force_implementation	         None
 #blob_blob_force_implementation	         pycuda 
-# Set parameters for repulsion, which is of form ???? FLOREN
-# To change the potential you can edit ???
-
+# Set parameters for repulsion, which is of form ??? FLOREN
+# To change the potential you can edit ??? FLOREN
 repulsion_strength			                 0.0165677856
 debye_length	   			                   0.0656
 
@@ -35,19 +34,22 @@ debye_length	   			                   0.0656
 # the harmonic potential is strong enough to keep blobs from ever going on the other side of the wall
 # The code prints out "invalid configurations" which should be very small or zero
 # It tells you how many configurations had a blob on the wrong side of the wall
+# If you want to instead add repulsion with the wall also edit the file ??? FLOREN
+# see for example source code ??? FLOREN which implements a Debye-type potential
 repulsion_strength_wall                  0.0165677856
 debye_length_wall	   		                 5.0
 
 # Set time step, number of steps and save frequency for particle configurations
+# To figure out right time step, compute histogram of z positions and compare to Gibbs-Boltzmann ??? FLOREN any better ideas?
 dt		 	   	     	                       0.016
 n_steps					                         20
 n_save  				                         5
 
-# Set initial step, code saves not data for steps < 0
+# Set numer of initialization/equilibration steps: code saves not data for steps < initial_step
 initial_step				                     0
 
-# Set tolerance for iterative solvers (Lanczos and GMRES if used)
-solver_tolerance			                   1e-4
+# Set tolerance for iterative solvers (Lanczos and GMRES if used): 1e-3 or 1e-4 should be enough
+solver_tolerance			                   1e-3
 
 # Set viscosity, gravity, blob radius and temperature (k_B*T)
 eta                                      1.0e-3
