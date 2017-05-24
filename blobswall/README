@@ -39,3 +39,17 @@ gfortran -o initial.x initial.f90
 
 8. Run code
 python ../RigidMultiblobsWall/multi_bodies/multi_bodies.py --input-file inputfile_hydroGrid.dat 
+
+This will produce a number of files. You can open and plot in visit
+
+data/HydroGrid.S_k.pair=1.vtk
+
+which is the static structure factor S(kx,ky). For an ideal system this should be flat and equal to rho_av, the average number density in the plane.
+
+The files
+data/HydroGrid.S_k_w.k=???.{Re,Im}.dat
+store the dynamic structure factor of the total density S(k,w) for the given k (see README.md for HydroGrid)
+For the result in the time domain, see
+data/HydroGrid.S_k_t.k=???.{Re,Im}.dat
+The first row in these files shows the value of (kx,ky).
+The first column is frequency or time, and the second is the real or imaginary value of the structure factor

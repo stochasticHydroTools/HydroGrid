@@ -42,6 +42,8 @@ These spectra are averaged over 2000 fluam steps, computing spectra every 4 step
 
 To you look at the spectrum of the total density rho=rho_red+rho_green, change pair=2 to pair=1. This won't show giant fluctuations. Just red particles is pair=3, and cross-correlation red-green is pair=4 -- both show giant fluctuations but pair=4 is negative (unlike uncorrelated walkers where pair=4 would be zero).
 
+Note that for an ideal gas with no correlations, the theoretical result is S(k)=rho_av, where rho_av is the average number density in the plane. So for S_k.pair=2 the value for uncorrelated walkers is rho_green_av = N_green_particles/volume, and for S_k.pair=1 the value for uncorrelated walkers is rho_total_av = N_total_particles/volume.
+
 4. This also records dynamic structure factors but this is not too important at present. For example, to see S(kx,t) for the 6th wavenumber kx=16*(2*Pi/L) use:
 
 xmgrace Quasi2DProj.000{02,04,06,08,10}000.S_k_t.k=16.Re.dat
