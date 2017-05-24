@@ -23,8 +23,12 @@ rf_delta  3e-3
 # Use implementation=pycuda for GPU-based, None for ideal particles, or C++ for CPU-based
 blob_blob_force_implementation	         None
 #blob_blob_force_implementation	         pycuda 
-# Set parameters for repulsion, which is of form ??? FLOREN
-# To change the potential you can edit ??? FLOREN
+# Set parameters for repulsion, which is of form 
+#   U(r) = repulsion_strength * (1.0 + (2*blob_radius - r) /  debye_length) if r <= 2*blob_radius
+#   U(r) = repulsion_strength * exp(-(r-2*blob_radius) / debye_length) if r > 2*blob_radius
+# To change the potential you can edit:
+# blob_blob_force in forces_pycuda.py for the pycuda implementation.
+# See documentation to change the  python or the C++ implementations.
 repulsion_strength			                 0.0165677856
 debye_length	   			                   0.0656
 
@@ -34,13 +38,18 @@ debye_length	   			                   0.0656
 # the harmonic potential is strong enough to keep blobs from ever going on the other side of the wall
 # The code prints out "invalid configurations" which should be very small or zero
 # It tells you how many configurations had a blob on the wrong side of the wall
-# If you want to instead add repulsion with the wall also edit the file ??? FLOREN
-# see for example source code ??? FLOREN which implements a Debye-type potential
+# If you want to instead add repulsion with the wall also edit the 
+# function blob_external_force on the file RigidMultiblobsWall/multi_bodies/multi_bodies_functions.py
+# 
+# see for example source code which implements a Debye-type potential in the
+# master branch
 repulsion_strength_wall                  0.0165677856
 debye_length_wall	   		                 5.0
 
 # Set time step, number of steps and save frequency for particle configurations
-# To figure out right time step, compute histogram of z positions and compare to Gibbs-Boltzmann ??? FLOREN any better ideas?
+# To figure out right time step, compute histogram of z positions and compare to Gibbs-Boltzmann.
+# Results for the Quasi-2D system influam suggest to use 
+# CFL = kT / (3 * pi * eta * a**3) = 0.02
 dt		 	   	     	                       0.016
 n_steps					                         20
 n_save  				                         5
