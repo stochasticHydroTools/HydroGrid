@@ -27,7 +27,7 @@
    ! Dynamic structure factors:
    nWavenumbers=-1 ! Negative value means specify a range of wavenumbers, zero means don't compute
    selectedWavenumbers="-4 4, 0 4"
-   nSavedSnapshots=10 ! How many snapshots to compute time-correlation functions over
+   nSavedSnapshots=100 ! How many snapshots to compute time-correlation functions over
    
    outputFolder = "./data"
    filePrefix = "HydroGrid" ! Prefix for all file names

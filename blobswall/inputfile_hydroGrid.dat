@@ -42,7 +42,6 @@ debye_length	   			                   0.0656
 # It tells you how many configurations had a blob on the wrong side of the wall
 # If you want to instead add repulsion with the wall also edit the 
 # function blob_external_force on the file RigidMultiblobsWall/multi_bodies/multi_bodies_functions.py
-# 
 # see for example source code which implements a Debye-type potential in the
 # master branch
 repulsion_strength_wall                  0.0165677856
@@ -50,8 +49,8 @@ debye_length_wall	   		                 5.0
 
 # Set time step, number of steps and save frequency for particle configurations
 # To figure out right time step, compute histogram of z positions and compare to Gibbs-Boltzmann.
-# Results for the Quasi-2D system influam suggest to use 
-# CFL = kT / (3 * pi * eta * a**3) = 0.02
+# Although it may be that one should also look at pair correlation functions
+# since in fluam2d we found we required smaller time step sizes for Quasi2D than True2D
 dt		 	   	     	                       0.016
 n_steps					                         500
 n_save  				                         50
