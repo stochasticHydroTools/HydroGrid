@@ -617,7 +617,9 @@ subroutine createDynamicFactors(grid, wavenumbersString)
       if( (iDimension/=2) .or. (grid%periodic)) then
          if ( (grid%selectedWavenumbers(iDimension, iWavenumber) < grid%minWavenumber(iDimension)) .or. &
               (grid%selectedWavenumbers(iDimension, iWavenumber) > grid%maxWavenumber(iDimension)) ) then
-              write(*,*) "Error: Selected wavenumber = ", iDimension, iWavenumber , " out of possible range"
+              write(*,*) "Error: Selected wavenumber k=", iWavenumber, " dim= ", iDimension, " out of possible range"
+              write(*,*) "Requested ", grid%selectedWavenumbers(iDimension, iWavenumber), " but range is ", &
+                 grid%minWavenumber(iDimension), grid%maxWavenumber(iDimension)
               stop
          end if
          grid%selectedWaveindices(iDimension, iWavenumber) = frequencyToArrayIndex( &
