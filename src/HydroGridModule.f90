@@ -227,6 +227,7 @@ module HydroGridModule
    logical, public, save :: writeSpectrumHistory=.false. ! Write out a history of the structure factors
    integer, public, save :: writeTheory=-1 ! Write the theoretical prediction for incompressible hydro (-2=for MD analysis, -1=none, 0=continuum, 1=MAC)
    integer, public, save :: useRelativeVelocity=-1 ! Calculate v12 to test two-fluid models
+   integer, public, save :: paddDynamicFFT=-1 ! -1=no padding, 0=padd with zeros, 1=padd with mirror image
    
 contains
 
@@ -403,8 +404,14 @@ subroutine createHydroAnalysis (grid, nCells, nSpecies, nVelocityDimensions, isS
    grid%nStructureFactors = nStructureFactors
    grid%nWavenumbers = nWavenumbers
    grid%nSavedRawSnapshots = nSavedSnapshots
-   !grid%nSavedSnapshots = nSavedSnapshots ! No doubling for FFTs
-   grid%nSavedSnapshots = 2*nSavedSnapshots-2 ! In order to minimize periodic artifacts, we double the length
+   select case(paddDynamicFFT)
+   case(1) ! Padd with mirror image of signal   
+      grid%nSavedSnapshots = 2*nSavedSnapshots-2 ! In order to minimize periodic artifacts, we double the length
+   case(0) ! Padd with zeros
+      grid%nSavedSnapshots = 2*nSavedSnapshots ! To compute true periodic convolution   
+   case default ! Don't padd
+      grid%nSavedSnapshots = nSavedSnapshots ! No doubling for FFTs
+   end select   
    grid%correlationWavenumber = correlationWavenumber
 
    call createStaticFactors(grid, structureFactorPairs, vectorStructureFactor)
@@ -424,7 +431,7 @@ contains
          nWavenumbers, selectedWavenumbers, nSavedSnapshots, axisToPrint, staggeredVelocities, &
          outputFolder, filePrefix, writeSpectrumVTK, writeVariancesVTK, writeMeansVTK, writeSnapshotVTK, &
          estimateCovariances, topConcentration, bottomConcentration, useRelativeVelocity, &
-         writeTheory, periodic, subtractMeanFT, correlationWavenumber, writeSpectrumHistory
+         writeTheory, periodic, subtractMeanFT, correlationWavenumber, writeSpectrumHistory, paddDynamicFFT
 
       ! Setup default values:
       storeConserved=.true.
@@ -1210,9 +1217,19 @@ subroutine updateStructureFactors(grid)
          do iWavenumber = 1, grid%nWavenumbers
             grid%dynamicFFTarray(1:grid%nSavedRawSnapshots) = &
                grid%savedStructureFactors(1:grid%nSavedRawSnapshots, iWavenumber, iVariable)
-            ! For the second half, invert the time so the result is periodic:
-            grid%dynamicFFTarray(grid%nSavedRawSnapshots+1 : 2*grid%nSavedRawSnapshots-2) = &
+
+            select case(paddDynamicFFT)
+            case(1) ! Padd with mirror image of signal   
+               ! For the second half, invert the time so the result is periodic:
+               grid%dynamicFFTarray(grid%nSavedRawSnapshots+1 : 2*grid%nSavedRawSnapshots-2) = &
                grid%savedStructureFactors(grid%nSavedRawSnapshots-1:2:-1, iWavenumber, iVariable)               
+            case(0) ! Padd with zeros
+               ! For the second half, invert the time so the result is periodic:
+               grid%dynamicFFTarray(grid%nSavedRawSnapshots+1 : 2*grid%nSavedRawSnapshots) = 0.0_wp               
+            case default ! Don't padd
+               if(ubound(grid%dynamicFFTarray,1)>grid%nSavedRawSnapshots) stop "Mismatch in size of dynamicFFTarray"
+            end select               
+               
             call FFTW_Execute(grid%dynamicFFTplan)
             grid%savedStructureFactors(:, iWavenumber, iVariable) = grid%dynamicFFTarray ! Use this as temporary storage
 

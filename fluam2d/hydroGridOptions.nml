@@ -25,6 +25,7 @@
    structureFactorPairs = "0 1 0 1" ! The zeros have to be here but mean nothing to us
    
    ! Dynamic structure factors:
+   paddDynamicFFT = -1 ! -1=no padding, 0=padd with zeros, 1=padd with mirror image
    nWavenumbers=0 ! Negative value means specify a range of wavenumbers, zero means don't compute
    selectedWavenumbers="-4 4, 0 4"
    nSavedSnapshots=100 ! How many snapshots to compute time-correlation functions over

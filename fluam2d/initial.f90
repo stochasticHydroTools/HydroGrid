@@ -7,6 +7,8 @@ program initial
   Lx=453.74818583181210299
   Ly=Lx
   
+  call RANDOM_SEED()
+  
   write(*,*) n
   do p=1,n
     call random_number(x)
