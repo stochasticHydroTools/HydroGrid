@@ -60,10 +60,7 @@ HydroGridModule.o: HydroGridModule.f90 FFTW.o VisitWriter.o
 
 HydroGridCInterface.o: HydroGridCInterface.f90 HydroGridModule.o
 	$(FC) -c $<
-
-TestHydroGrid.o: TestHydroGrid.c HydroGrid.h RNGs.h 
-	$(CC) -c $<
-
+        
 calculateConcentration.o: calculateConcentration.cpp
 	$(CXX) -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c $<
 

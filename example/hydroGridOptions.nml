@@ -23,9 +23,11 @@
    structureFactorPairs = "0 1 0 1" ! The zeros have to be here but mean nothing to us
    
    ! Dynamic structure factors:
+   paddDynamicFFT = 0 ! -1=no padding, 0=padd with zeros, 1=padd with mirror image
+   writeDynamicFiles=-1 ! 1 to write S(k,w), 0 to write individual k's, -1 for one big file
    nWavenumbers=-1 ! Negative value means specify a range of wavenumbers, zero to turn off S(k,w)
    ! Specify range of wavenumbers to output, here index kx=-4:4, ky=0:4
-   selectedWavenumbers="-4 4, 0 4"
+   selectedWavenumbers="-2 2, 0 2"
    nSavedSnapshots=100 ! How many snapshots to compute time-correlation functions for
    
    outputFolder = "./"
@@ -56,7 +58,8 @@
    structureFactorPairs = "0 1 0 1, 0 5 0 5, 0 6 0 6, 0 5 0 6"
    
    ! Dynamic structure factors:
-   paddDynamicFFT = -1 ! -1=no padding, 0=padd with zeros, 1=padd with mirror image
+   paddDynamicFFT = 0 ! -1=no padding, 0=padd with zeros, 1=padd with mirror image
+   writeDynamicFiles=-1 ! 1 to write S(k,w), 0 to write individual k's, -1 for one big file
    nWavenumbers=-1 ! Negative value means specify a range of wavenumbers, zero to turn off S(k,w)
    selectedWavenumbers="1 16, 0 0" ! Compute S(k,w) for kx=1:16
    nSavedSnapshots=100
