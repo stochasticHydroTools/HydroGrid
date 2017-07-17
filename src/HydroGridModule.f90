@@ -219,10 +219,11 @@ module HydroGridModule
       complex (r_fft), allocatable :: dynamicFactors(:, :, :)
          ! Dimension (nSavedSnapshots,nWavenumbers,nStructureFactors)
          ! Time-averaged dynamic structure factors, <SpatioTemporalFT(A)*CONJ(SpatioTemporalFT(B))>
-         ! What is actually output is the covariance:
-         ! <SpatioTemporalFT(A)*CONJ(SpatioTemporalFT(B))> - <SpatioTemporalFT(A)>*CONJ(<SpatioTemporalFT(B)>)
       complex (r_fft), allocatable :: meanDynamicFactors(:, :, :) ! Dimension (nSavedSnapshots,nWavenumbers,nVariablesToFFT)
          ! The mean of the spatio-temporal FT for each of the needed variables, <SpatioTemporalFT(A)>
+         ! The intent is to in the future output:
+         ! <SpatioTemporalFT(A)*CONJ(SpatioTemporalFT(B))> - <SpatioTemporalFT(A)>*CONJ(<SpatioTemporalFT(B)>)
+         ! But this is not yet implemented, so for now meanDynamicFactors is NOT COMPUTED
 
    end type HydroGrid
    
@@ -647,7 +648,7 @@ subroutine createDynamicFactors(grid, wavenumbersString)
    ! And for each of the selected wavenumbers, we keep a history (record) for some number of steps,
    ! and then do a temporal FFT and average the result over time:
    allocate(grid%savedStructureFactors(grid%nSavedSnapshots, grid%nWavenumbers, grid%nVariablesToFFT))
-   allocate(grid%meanDynamicFactors(grid%nSavedSnapshots, grid%nWavenumbers, grid%nVariablesToFFT))
+   if(.false.) allocate(grid%meanDynamicFactors(grid%nSavedSnapshots, grid%nWavenumbers, grid%nVariablesToFFT)) ! NOT FINISHED
    allocate(grid%dynamicFactors(grid%nSavedSnapshots, grid%nWavenumbers, grid%nStructureFactors))
 
    ! Prepare FFTWs internal stuff:
@@ -692,7 +693,7 @@ subroutine resetHydroAnalysis(grid)
 
    if(grid%nWavenumbers>0) then
       grid%dynamicFactors = 0.0_wp
-      grid%meanDynamicFactors = 0.0_wp
+      if(.false.) grid%meanDynamicFactors = 0.0_wp ! UNFINISHED
    end if
 
 end subroutine resetHydroAnalysis
@@ -1240,8 +1241,8 @@ subroutine updateStructureFactors(grid)
             call FFTW_Execute(grid%dynamicFFTplan)
             grid%savedStructureFactors(:, iWavenumber, iVariable) = grid%dynamicFFTarray ! Use this as temporary storage
 
-            ! Also keep track of the mean of the FT:
-            grid%meanDynamicFactors(:, iWavenumber, iVariable) = &
+            ! Also keep track of the mean of the FT -- UNFINISHED (not yet used for output)
+            if(.false.) grid%meanDynamicFactors(:, iWavenumber, iVariable) = &
                ( (grid%iTimeSeries - 1) * grid%meanDynamicFactors(:, iWavenumber, iVariable) + &
                grid%savedStructureFactors(:, iWavenumber, iVariable) ) / grid%iTimeSeries
          end do
