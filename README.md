@@ -121,7 +121,13 @@ contains the spectrum for the green particles (variable pair is (5,5)). This is 
 
 HydroGrid can also compute dynamic structure factors, i.e., S(k,t) or S(k,w). This is done for all pairs of particles for which static factors S(k) are computed, but only for a group of **selected wavenumbers**. This is because HydroGrid keeps a history of S(k) for those selected k's. The length of the history (in terms of number of calls to HydroGrid) is controlled by nSavedSnapshots in the namelist. So if you set nSavedSnapshots=100 this means that every 100 calls to updateHydroGrid the library will compute time correlation functions. These are then averaged over **blocks of nSavedSnapshots spectra** until you call saveHydroGrid to write the average S(k,w/t) to a file.
 
-When computing the time correlation functions, HydroGrid uses the FFT and **doubles the length of the time history** (i.e., of the block) and then mirror images the history so that one gets a periodic sequence and minimizes artifacts due to the use of FFT. This means that the smallest frequency w for which S(k,w) is written is:
+The output is controlled by the option:
+
+writeDynamicFiles=1 to write S(k,w), 0 to write individual k's, or -1 for one big file
+
+Only if writeDynamicFiles=1 is S(k,w) written to a file (separately for the real and imaginary parts). Otherwise, only time correlation functions S(k,t) (note that these are always real-valued) are written since S(k,t) is computed more accurately than S(k,w) as described below. One can choose whether to write one big file with all k's as columns for each structure factor pair (writeDynamicFiles=-1), or one file per wavenumber k but with all structure factor pairs written as columns (writeDynamicFiles=0).
+
+When computing the time correlation functions, HydroGrid uses the FFT and **doubles the length of the time history** (i.e., of the block) and then padds with zeros to avoid introducing periodic artifacts due to the FFT (this corresponds to the default value of the option paddDynamicFFT=0). This means that the smallest frequency w for which S(k,w) is written (if writeDynamicFiles=1) is:
 
 w_min = 2*Pi/(2*nSavedSnapshots*dtime)
 
@@ -131,7 +137,9 @@ t_min = dtime
 
 and the largest is
 
-t_max=2*nSavedSnapshots*dtime
+t_max=nSavedSnapshots*dtime
+
+For time correlation functions S(k,t), HydroGrid implements an unbiased estimator that is equivalent to a standard double loop over all time lags and points but using an FFT to accelerate the computation. However, there appears to be no simple way to obtain an unbiased estimator of S(k,w) without using windowing and other complicated tricks. If one wants S(k,w) and not S(k,t) then one can set paddDynamicFFT=-1 which does not padd the sequence with zeros and just does FFTs assuming the sequence is periodic, which will introduce some bias.
 
 ### Wavenumber selection
 
@@ -153,12 +161,14 @@ and outputs a list of the wavenubers it will track:
 
  Tracking wavenumber index=           7  k_index=           2           0           0
  
-This means that output files with name containing k=7 pertain to wavenumber k=(2*2*Pi/Lx, 0*2*Pi/Ly). The actual result for S(k,w) and S(k,t) are written to the files:
+This means that output files with name containing k=7 pertain to wavenumber k=(2*2*Pi/Lx, 0*2*Pi/Ly).
 
-run.S_k_t.k=7.{Re,Im}.dat
+For writeDynamicFiles=1, the actual result for S(k,w) and S(k,t) are written to the files:
+
+run.S_k_t.k=7.dat
 
 as a function of time, and
 
 run.S_k_w.k=7.{Re,Im}.dat
 
-as a function of w. Note that the first line of this file shows the wavenumber k so you can make sure you know what k you are looking at.
+as a function of w. Note that the first line of this file shows the wavenumber k so you can make sure you know what k you are looking at. If writeDynamicFiles=-1, then the code writes one big file run.S_k_t.pair=?.dat for each structure factor pair, with all the k's as columns. The order of the k's in the file is the same as the numbering printed in the beginning. The k=2*Pi*(i/Lx,j/Ly,k/Lz) are ordered on a grid and the loop is k outermost, j inner, and i innermost (Fortran order). There is one catch however -- the library skips zero wavenumber k=(0,0,0) since this is time-independent for conservation laws and usually behaves very differently from other wavenumbers.
