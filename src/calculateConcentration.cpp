@@ -31,6 +31,7 @@ bool callHydroGrid(const int option,
                    const string outputname,
                    double *c,
                    double *density,
+                   double *velocity,
                    const int mx,
                    const int my,
                    const double lx,
@@ -49,11 +50,12 @@ void calculateConcentration(string outputname,
                             int step, // Step of simulation
                             double dt, // Time interval between successive snapshots (calls to updateHydroGrid)
                             int np, // Number of particles
-                            int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (finalize)
+                            int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (save+finalize), 4 (finalize only)
                             double *x_array, double *y_array){
   
+  static int n_calls = 0;
   static double dx, dy, inverse_volume_cell;
-  static double *c, *density;
+  static double *c, *density, *velocity, *x_old, *y_old;
 
   dx = lx / mx;
   dy = ly / my;
@@ -61,12 +63,20 @@ void calculateConcentration(string outputname,
   
   c = new double [mx*my*2];
   density = new double [mx*my];
+  velocity = new double [mx*my*2]; // vx and vy must be consecutive for each grid point
       
   if(option == 0) { // Initialize HydroGrid
+    
+    // In order to compute displacements we will need to 
+    x_old = new double [np];
+    y_old = new double [np];
+    n_calls=0;
+        
     callHydroGrid(0,
                   outputname,
                   c,
                   density,
+                  velocity,
                   mx,
                   my,
                   lx,
@@ -81,14 +91,32 @@ void calculateConcentration(string outputname,
       c[i] = 0;  
       c[mx*my+i] = 0;
       density[i] = 0;
+      velocity[i] = 0;  
+      velocity[mx*my+i] = 0;     
     }
   
     // Loop over particles and save as concentration
-    for(int i=0;i<np;i++){
+    for(int i=0;i<np;i++) {
       // Extract data
       
       double x = x_array[i];     
-      double y = y_array[i];     
+      double y = y_array[i];
+      double v_x = 0;
+      double v_y = 0;   
+
+      if(n_calls > 0)
+      {
+         // We scale the Brownian "velocities" here assuming diffusive dynamics, not balistic:
+         v_x = (x-x_old[i])/sqrt(dt);
+         v_y = (y-y_old[i])/sqrt(dt);
+      }
+      else
+      {
+         v_x = 0;
+         v_y = 0;
+      }
+      x_old[i]=x;
+      y_old[i]=y;
       
       // Use PBC
       x = x - (int(x / lx + 0.5*((x>0)-(x<0)))) * lx;
@@ -107,32 +135,56 @@ void calculateConcentration(string outputname,
         c[mx*my+icel] += 1.0;
       }
       density[icel] += 1.0;
+      velocity[icel] += v_x;
+      velocity[mx*my+icel] += v_y;
+      
     }
 
-    // Scale concentration and density fields
+    // Scale concentration and density fields (but not velocities)
     for(int i=0; i < mx*my; i++){
       density[i] = inverse_volume_cell*density[i];
       c[i]       = inverse_volume_cell*c[i];
       c[mx*my+i] = inverse_volume_cell*c[mx*my+i];
     }
 
-    // Call HydroGrid to update data
-    callHydroGrid(1,
+    if(n_calls == 1)
+    {
+      // Because we didn't have displacements the first time we called this code we reset now
+      callHydroGrid(4, // Reset
                   outputname,
                   c,
                   density,
+                  velocity,
                   mx,
                   my,
                   lx,
                   ly,
                   dt,
-                  step);  
+                  step); 
+    }
+
+    // Call HydroGrid to update data but now add displacements
+    n_calls++;
+    callHydroGrid(1, // Update
+               outputname,
+               c,
+               density,
+               velocity,
+               mx,
+               my,
+               lx,
+               ly,
+               dt,
+               step); 
+                  
+                  
   }
   else if(option == 2){ // Call HydroGrid to print data
     callHydroGrid(3,
                   outputname,
                   c,
                   density,
+                  velocity,
                   mx,
                   my,
                   lx,
@@ -146,18 +198,37 @@ void calculateConcentration(string outputname,
                   outputname,
                   c,
                   density,
+                  velocity,
                   mx,
                   my,
                   lx,
                   ly,
                   dt,
                   step);
-
+   delete[] x_old;
+   delete[] y_old;                  
+  }
+  else if(option == 4){ // Call HydroGrid to print final data and free memory
+    // Free HydroGrid
+    callHydroGrid(5,
+                  outputname,
+                  c,
+                  density,
+                  velocity,
+                  mx,
+                  my,
+                  lx,
+                  ly,
+                  dt,
+                  step);
+   delete[] x_old;
+   delete[] y_old;                  
   }
 
   // Free memory
   delete[] c;
   delete[] density;
+  delete[] velocity;
 
 }
 

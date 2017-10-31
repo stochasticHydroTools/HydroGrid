@@ -1695,7 +1695,7 @@ subroutine writeStructureFactors(grid,filenameBase)
    type (HydroGrid), target :: grid
    character(len=*) :: filenameBase
 
-   integer :: structureFactorFile(3) = (/521, 522, 523/)
+   integer :: structureFactorFile(5) = (/521, 522, 523, 534, 525/)
    integer :: i, j, k, iSpecies, species, species1, species2, nTemps, dim, &
               iVariable, variable, variable1, variable2, iVariance, minky, maxky
    integer, dimension(nMaxDims) ::  mink, maxk, mesh_dims         
@@ -2052,20 +2052,53 @@ subroutine writeStructureFactors(grid,filenameBase)
          varnames(n_S_k_vars)="Theory" // C_NULL_CHAR
          nTemps=n_S_k_vars
       else if(any(grid%vectorFactors/=0)) then
+            
          ! We will project the solution onto the discrete modes
          ! Projection onto divergence-free vector fields:
          varnames(n_S_k_vars+1)="Longitudinal" // C_NULL_CHAR
          ! Projection onto the first non-divergence free mode:
          varnames(n_S_k_vars+2)="Vortical-Z" // C_NULL_CHAR
-         if(grid%nDimensions>2) then
+         
+         if(grid%writeTheory==-2) then
+            filename=trim(filenameBase) // ".S_k.longitudinal.dat"
+            write(*,*) "Writing longitudinal component of velocity static structure factor to file ", trim(filename)
+            open (file = trim(filename), unit=structureFactorFile(1), status = "unknown", action = "write")
+         end if
+         
+         if(grid%nDimensions>2) then ! In 3D here are two vortical modes
             ! Projection onto the second non-divergence free mode and the mode-mode correlation:
             varnames(n_S_k_vars+3)="Vortical-XY" // C_NULL_CHAR         
             varnames(n_S_k_vars+4)="Vortical-XY-Z" // C_NULL_CHAR
             nModes=4
-         else
+
+            if(grid%writeTheory==-2) then
+
+               filename=trim(filenameBase) // ".S_k.vortical-z.dat"
+               write(*,*) "Writing vortical-z component of velocity static structure factor to file ", trim(filename)
+               open (file = trim(filename), unit=structureFactorFile(2), status = "unknown", action = "write")
+
+               filename=trim(filenameBase) // ".S_k.vortical-xy.dat"
+               write(*,*) "Writing vortical-xy component of velocity static structure factor to file ", trim(filename)
+               open (file = trim(filename), unit=structureFactorFile(3), status = "unknown", action = "write")
+
+               filename=trim(filenameBase) // ".S_k.vortical-xy-z.dat"
+               write(*,*) "Writing vortical-xy-z component of velocity static structure factor to file ", trim(filename)
+               open (file = trim(filename), unit=structureFactorFile(4), status = "unknown", action = "write")
+
+            end if
+
+         else ! In 2D there is only one vortical mode
             nModes=2      
+
+            if(grid%writeTheory==-2) then
+               filename=trim(filenameBase) // ".S_k.vortical.dat"
+               write(*,*) "Writing vortical component of velocity static structure factor to file ", trim(filename)
+               open (file = trim(filename), unit=structureFactorFile(2), status = "unknown", action = "write")
+            end if
+
          end if         
          nTemps=n_S_k_vars+nModes
+         
       end if
 
       if(any(grid%vectorFactors/=0)) then
@@ -2187,7 +2220,7 @@ subroutine writeStructureFactors(grid,filenameBase)
          end do
          kCell = kCell + 1 ; if (kCell > grid%nCells(3)) kCell = 1
          end do
-                  
+                           
          do dim=1, n_S_k_vars
             call WriteStats_S_k(id=iStructureFactor)
          end do                     
@@ -2242,16 +2275,35 @@ subroutine writeStructureFactors(grid,filenameBase)
          end if      
                
 
-      end do
+      end do ! Loop over iStructureFactor
       
       if(nTemps > n_S_k_vars) then ! Write the trace separately
+
+         ! Now write all of the projections of the velocity tensor to plain text files if requested in addition to VTK files
+         if(grid%writeTheory==-2) then
+            do k = mink(3), maxk(3)
+               do j = mink(2), maxk(2)
+                  do i = mink(1), maxk(1)
+                     do iMode=1, nModes
+                        write(structureFactorFile(iMode), '(g17.9)', advance="no") S_k_array(i,j,k,n_S_k_vars+iMode)
+                     end do ! x 
+                  end do
+                  do iMode=1, nModes
+                     write(structureFactorFile(iMode), *) ! Newline
+                  end do
+               end do ! y
+               do iMode=1, nModes
+                  write(structureFactorFile(iMode), *) ! Newline
+               end do
+            end do ! z
+         end if
       
          write(structureFactorFile(3),*) ! Newline         
          do dim=n_S_k_vars+1,nTemps
             call WriteStats_S_k(id=dim-n_S_k_vars)
          end do   
 
-         filename=trim(filenameBase) // ".S_k.trace.vtk"
+         filename=trim(filenameBase) // ".S_k.modes.vtk"
          write(*,*) "Writing static structure factor to VTK file ", trim(filename)
          filename = trim(filename) // C_NULL_CHAR
 

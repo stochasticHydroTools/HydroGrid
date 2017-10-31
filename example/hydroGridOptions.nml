@@ -1,7 +1,9 @@
 ! Numbering of variables is:
-! 1=rho (total density), 2-4 (unused = vx, vy, temperature), 5=rho_green, 6=rho_red
+! 1=rho (total density), 2-4 (vx, vy, temperature), 5=rho_green, 6=rho_red
 
 &hydroAnalysisOptions ! This first namelist corresponds to the whole 2D grid
+
+   staggeredVelocities = 0 ! Are velocities on a staggered grid or not, (0, +1, or -1)*h/2
 
    writeSnapshotVTK=F ! Save snapshots of the instantaneous fields
    subtractMeanFT=F ! Keep this at F
@@ -18,16 +20,21 @@
    ! Static structure factors
    writeSpectrumVTK = T
    writeAbsValue = T ! Only write absolute values of complex values to VTK file?
-   nStructureFactors = 1 ! Set to zer to turn off
-   ! Compute rho-rho structure factor
-   structureFactorPairs = "0 1 0 1" ! The zeros have to be here but mean nothing to us
+   writeTheory = -2 ! Write the theoretical prediction (0 or 1) or project discretely (-1)
+   nStructureFactors = 3 ! Set to zero to turn off
+   ! Compute rho-rho structure factor which is the usual S(k),
+   ! and also correlations for Brownian "velocities"
+   ! 1=rho-rho, 2=vx-vx, 3=vy-vy, 4=vx-vy
+   structureFactorPairs = "0 1 0 1, 0 2 0 2, 0 3 0 3, 0 2 0 3"
+      ! The zeros have to be here but mean nothing to us
+   vectorStructureFactor = "0 1 2 -1" ! For grouping into a tensor (>0 diag, <0 off-diag, 0=none)
    
    ! Dynamic structure factors:
    paddDynamicFFT = 0 ! -1=no padding, 0=padd with zeros, 1=padd with mirror image
    writeDynamicFiles=-1 ! 1 to write S(k,w), 0 to write individual k's, -1 for one big file
    nWavenumbers=-1 ! Negative value means specify a range of wavenumbers, zero to turn off S(k,w)
-   ! Specify range of wavenumbers to output, here index kx=-4:4, ky=0:4
-   selectedWavenumbers="-2 2, 0 2"
+   ! Specify range of wavenumbers to output, here index kx=2:4, ky=2:4
+   selectedWavenumbers="2 4, 2 4"
    nSavedSnapshots=100 ! How many snapshots to compute time-correlation functions for
    
    outputFolder = "./"
@@ -37,6 +44,8 @@
 /
 
 &hydroAnalysisOptions ! This corresponds to the projection along the y axes, which is a 1D grid
+
+   staggeredVelocities = 0 ! Are velocities on a staggered grid or not, (0, +1, or -1)*h/2
 
    writeSnapshotVTK=F ! Save snapshots of the instantaneous fields
    subtractMeanFT=F ! Keep this at F
@@ -61,7 +70,7 @@
    paddDynamicFFT = 0 ! -1=no padding, 0=padd with zeros, 1=padd with mirror image
    writeDynamicFiles=-1 ! 1 to write S(k,w), 0 to write individual k's, -1 for one big file
    nWavenumbers=-1 ! Negative value means specify a range of wavenumbers, zero to turn off S(k,w)
-   selectedWavenumbers="1 16, 0 0" ! Compute S(k,w) for kx=1:16
+   selectedWavenumbers="1 4, 0 0" ! Compute S(k,w) for kx=1:4
    nSavedSnapshots=100
    
    outputFolder = "./"

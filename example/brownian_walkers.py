@@ -40,7 +40,7 @@ if __name__ == '__main__':
   # Set variables
   num_particles = 1024
   chi = 1 # Diffusion coefficient
-  nsteps = 10000 # Number of steps
+  nsteps = 1000 # Number of steps
   sample = 0 # How often to output HydroGrid statistics, if zero only output stats at the end
   L = np.array([256.0, 256.0])
   cells = np.array([32, 32], dtype=int)  
@@ -56,26 +56,38 @@ if __name__ == '__main__':
   dt = L[1]*L[1]/chi/5000.0 # Time step
   dx = np.array([1.0, 1.0])*np.sqrt(2*chi*dt)
 
+  print 'num_particles= ', num_particles, ' dt=', dt
+
   # Initialize HydroGrid library:
   cc.calculate_concentration("run", L[0], L[1], 0, last_green, int(cells[0]), int(cells[1]), 0, dt, num_particles, 0, r_vectors)
 
-  print 'num_particles= ', num_particles, ' dt=', dt
+  # It is useful to save the initial condition to a file sometimes:
+  cc.calculate_concentration("run", L[0], L[1], 0, last_green, int(cells[0]), int(cells[1]), 0, dt, num_particles, 1, r_vectors)
+  cc.calculate_concentration("run", L[0], L[1], 0, last_green, int(cells[0]), int(cells[1]), 0, dt, num_particles, 2, r_vectors)
+
   start = time.time()
   for step in range(nsteps):
-    print 'step=', step
+    if step % 10 == 0: 
+       print 'step=', step
 
-    # Update HydroGrid data
-    cc.calculate_concentration("run", L[0], L[1], 0, last_green, int(cells[0]), int(cells[1]), step, dt, num_particles, 1, r_vectors)
-
-    if sample > 0:
-      if step % sample == 0:
-        # Print HydroGrid data
-        cc.calculate_concentration("run", L[0], L[1], 0, last_green, int(cells[0]), int(cells[1]), step, dt, num_particles, 2, r_vectors)
-
-    # Random Gaussian displacement
+    # Move the particles using random Gaussian displacement
     r_vectors += np.random.randn(r_vectors.shape[0], 2) * dx
 
-  # Print final data and free memory
-  cc.calculate_concentration("run", L[0], L[1], 0, last_green, int(cells[0]), int(cells[1]), step, dt, num_particles, 3, r_vectors)
+    # Update HydroGrid data
+    cc.calculate_concentration("run", L[0], L[1], 0, last_green, int(cells[0]), int(cells[1]), step+1, dt, num_particles, 1, r_vectors)
+
+    if sample > 0:
+      if (step+1) % sample == 0:
+        # Print HydroGrid data
+        cc.calculate_concentration("run", L[0], L[1], 0, last_green, int(cells[0]), int(cells[1]), step+1, dt, num_particles, 2, r_vectors)
+
+  # end for loop (step)
+
+  if sample > 0:
+     # free memory ONlY (not really implemented in HydroGrid though)
+     cc.calculate_concentration("run", L[0], L[1], 0, last_green, int(cells[0]), int(cells[1]), -1, dt, num_particles, 4, r_vectors)
+  else:
+     # Print final data and free memory
+     cc.calculate_concentration("run", L[0], L[1], 0, last_green, int(cells[0]), int(cells[1]), -1, dt, num_particles, 3, r_vectors)
 
   print 'total time = ', time.time() - start

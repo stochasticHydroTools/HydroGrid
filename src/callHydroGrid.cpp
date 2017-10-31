@@ -10,10 +10,14 @@ extern "C" {
 #include "HydroGrid.h"
 }
 
+// Meaning of option=0: Initialize, option=1: Add new data (update), 
+// option=2: Finalize, option=3: Save data and finalize,
+// option=4: Just reset without saving, option=5: Just finalize without saving data
 bool callHydroGrid(const int option,
                    const string outputname,
                    double *c,
                    double *density,
+                   double *velocity,
                    const int mx,
                    const int my,
                    const double lx,
@@ -56,7 +60,7 @@ bool callHydroGrid(const int option,
                           1 /*project2D*/);
   }
   else if(option == 1){
-    updateHydroAnalysisMixture_C(NULL /*velocities*/, density /*densities*/, c /*concentrations*/);
+    updateHydroAnalysisMixture_C(velocity /*velocities*/, density /*densities*/, c /*concentrations*/);
   }
   else if(option == 2){
     writeToFiles_C(-1); // Write to files
@@ -64,6 +68,12 @@ bool callHydroGrid(const int option,
   }
   else if(option == 3){
     writeToFiles_C(step); // Write to files
+  }
+  else if(option == 4){
+    resetHydroAnalysis_C(); // Write to files
+  }
+  else if(option == 5){
+    destroyHydroAnalysis_C();
   }
   return 0;
 }
