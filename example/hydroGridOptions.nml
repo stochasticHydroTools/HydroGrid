@@ -21,7 +21,7 @@
    writeSpectrumVTK = T
    writeAbsValue = T ! Only write absolute values of complex values to VTK file?
    writeTheory = -2 ! Write the theoretical prediction (0 or 1) or project discretely (-1)
-   nStructureFactors = 3 ! Set to zero to turn off
+   nStructureFactors = 4 ! Set to zero to turn off
    ! Compute rho-rho structure factor which is the usual S(k),
    ! and also correlations for Brownian "velocities"
    ! 1=rho-rho, 2=vx-vx, 3=vy-vy, 4=vx-vy

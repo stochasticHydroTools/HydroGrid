@@ -4,8 +4,8 @@
 
 # Chose scheme
 # quasi2D or stokesLimit2D for strictly 2D hydrodynamics
-# quasi2D
-stokesLimit2D
+quasi2D
+#stokesLimit2D
 particles                               1
 
 # Default integrator is Forward-Euler, to
@@ -48,7 +48,7 @@ celldimension                           453.74818583181210299 453.74818583181210
 # and optionally a file for the initial velocities.
 # If no file is given the particles start in simple cubic lattice.
 loadparticles		                        1
-coordinates		                          Quasi2D.init
+coordinates		                          fluam2d.init
 
 
 # Seed to feed the random number generator. If no one is given 
@@ -58,9 +58,9 @@ coordinates		                          Quasi2D.init
 # Number of relaxation steps during which fluam save no data 
 numstepsRelaxation	                    0
 # Number of steps (no counting numstepsRelaxation) 
-numsteps                                10000
+numsteps                                1000
 # Save particle data every samplefreq steps 
-samplefreq                              2000
+samplefreq                              10000
 # Time step
 dt                                      0.2
 
@@ -78,8 +78,8 @@ outputname                              Quasi2D
 # the rest of particles are red
 greenParticles                          0 10666
 # number of cells to compute concentration
-cellsHydroGrid                          512 64
+cellsHydroGrid                          128 128
 # Do HydroGrid analysis every "sampleHydroGrid" steps
 sampleHydroGrid                         4
 # if savefreq > 0 HydroGrid saves results every savefreq steps and it restarts
-savefreq		                            2000
+savefreq		                            0
