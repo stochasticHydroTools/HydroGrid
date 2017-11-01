@@ -32,7 +32,7 @@ import time
 
 sys.path.append('./')
 
-import CallHydroGrid as cc
+import libCallHydroGrid as cc
 
 
 if __name__ == '__main__':
