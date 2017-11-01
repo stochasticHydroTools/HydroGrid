@@ -269,7 +269,7 @@ void calculateConcentrationPython(string outputname,
                             
 }
 
-BOOST_PYTHON_MODULE(calculateConcentration)
+BOOST_PYTHON_MODULE(libCallHydroGrid)
 {
   using namespace boost::python;
   boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
