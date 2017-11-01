@@ -1,3 +1,6 @@
+# Point to the source code directory for HydroGrid:
+SRC_HYDROLIB=../src
+
 # Note that option -fPIC is important for python linking
 
 # C/C++ compiler:
@@ -42,7 +45,10 @@ PYTHON_VERSION = 2.7
 # CentOs:
 PYTHON_DIR = /usr/local/stow/python-$(PYTHON_VERSION)
 PYTHON_INCLUDE = $(PYTHON_DIR)/include/python$(PYTHON_VERSION)
-PYTHON_LIB = $(PYTHON_DIR)/lib/python$(PYTHON_VERSION)/config/
+# This is for static library:
+#PYTHON_LIB = $(PYTHON_DIR)/lib/python$(PYTHON_VERSION)/config/
+# Better to use the dynamic library
+PYTHON_LIB = $(PYTHON_DIR)/lib/
 
 # location of the Boost Python include files and library
 BOOST_INC = /usr/include/boost

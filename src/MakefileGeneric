@@ -20,7 +20,7 @@ LIBOBJECTS = Precision.o FFTW.o VisitWriter.o HydroGridModule.o HydroGridCInterf
 
 EXECUTABLES = 
 
-all: $(EXECUTABLES) libHydroAnalysis.a calculateConcentration.so libCallHydroGrid.a
+all: $(EXECUTABLES) libHydroAnalysis.a libCallHydroGrid.a libCallHydroGrid.so
 
 clean:
 	rm -rf *.o *.mod lib*.a *.so $(EXECUTABLES)
@@ -70,6 +70,5 @@ callHydroGrid.o: callHydroGrid.cpp
 libCallHydroGrid.a: callHydroGrid.o calculateConcentration.o 
 	ar rcs libCallHydroGrid.a callHydroGrid.o calculateConcentration.o
 
-calculateConcentration.so: calculateConcentration.o callHydroGrid.o libHydroAnalysis.a
-	$(CXX) -shared -dynamiclib -O3 calculateConcentration.o callHydroGrid.o -L$(BOOST_LIB) -lboost_python -L$(PYTHON_LIB) -lpython$(PYTHON_VERSION) -L./ -lHydroAnalysis $(LIBRARIES) -o calculateConcentration.so
-
+libCallHydroGrid.so: calculateConcentration.o callHydroGrid.o libHydroAnalysis.a
+	$(CXX) -shared -dynamiclib -O3 calculateConcentration.o callHydroGrid.o -L$(BOOST_LIB) -lboost_python -L$(PYTHON_LIB) -lpython$(PYTHON_VERSION) -L./ -lHydroAnalysis $(LIBRARIES) -o libCallHydroGrid.so
