@@ -169,7 +169,8 @@ module HydroGridModule
       logical :: writeAbsValue=.true. ! Only write absolute value of static structure factors to VTK files
       logical :: estimateCovariances=.false. ! Estimate the covariance of all pairs of spectra
       logical :: subtractMeanFT=.false. ! Subtract the mean of the structure factors (for non-uniform systems)
-      integer :: writeTheory=-1 ! Write the theoretical prediction for incompressible hydro (-2=for MD analysis, -1=none, 0=continuum, 1=MAC)
+      integer :: writeTheory=-1 ! Write the theoretical prediction for incompressible hydro, and whether to use continuum or staggered MAC grid modified wavenumber
+         ! -2=project onto modes using continuum, -1=project onto modes using MAC, 0=write continuum theory, 1=write MAC theory, 3=project onto modes using continuum (VTK output only)
       real (wp) :: structFactMultiplier = 1.0_wp ! Normalization for structure factors
       integer :: nStructureFactors = 0 ! How many pairs of variables to calculate Fourier-space cross-correlations for
       integer, allocatable :: vectorFactors(:) ! Dimension (nStructureFactors), 1=diagonal, -1=off-diagonal
@@ -2059,7 +2060,7 @@ subroutine writeStructureFactors(grid,filenameBase)
          ! Projection onto the first non-divergence free mode:
          varnames(n_S_k_vars+2)="Vortical-Z" // C_NULL_CHAR
          
-         if(grid%writeTheory==-2) then
+         if(grid%writeTheory<0) then
             filename=trim(filenameBase) // ".S_k.longitudinal.dat"
             write(*,*) "Writing longitudinal component of velocity static structure factor to file ", trim(filename)
             open (file = trim(filename), unit=structureFactorFile(1), status = "unknown", action = "write")
@@ -2071,7 +2072,7 @@ subroutine writeStructureFactors(grid,filenameBase)
             varnames(n_S_k_vars+4)="Vortical-XY-Z" // C_NULL_CHAR
             nModes=4
 
-            if(grid%writeTheory==-2) then
+            if(grid%writeTheory<0) then
 
                filename=trim(filenameBase) // ".S_k.vortical-z.dat"
                write(*,*) "Writing vortical-z component of velocity static structure factor to file ", trim(filename)
@@ -2090,7 +2091,7 @@ subroutine writeStructureFactors(grid,filenameBase)
          else ! In 2D there is only one vortical mode
             nModes=2      
 
-            if(grid%writeTheory==-2) then
+            if(grid%writeTheory<0) then
                filename=trim(filenameBase) // ".S_k.vortical.dat"
                write(*,*) "Writing vortical component of velocity static structure factor to file ", trim(filename)
                open (file = trim(filename), unit=structureFactorFile(2), status = "unknown", action = "write")
@@ -2158,7 +2159,7 @@ subroutine writeStructureFactors(grid,filenameBase)
                else if(grid%vectorFactors(iStructureFactor)<0) then ! <v_x, v_y> = P_xy
                   S_k_array(i,j,k,n_S_k_vars) = -kdrh(1)*kdrh(2)/max(sum(kdrh**2), epsilon(1.0_wp))
                end if   
-            else if(grid%writeTheory>0) then ! Write the discrete theoretical prediction (MAC projection)
+            else if(grid%writeTheory==1) then ! Write the discrete theoretical prediction (MAC projection)
                if(grid%vectorFactors(iStructureFactor)>0) then ! <v_x, v_x> = P_xx
                   if((i==0).and.(j==0).and.(k==0)) then
                      S_k_array(i,j,k,n_S_k_vars) = 1.0_wp
@@ -2280,7 +2281,7 @@ subroutine writeStructureFactors(grid,filenameBase)
       if(nTemps > n_S_k_vars) then ! Write the trace separately
 
          ! Now write all of the projections of the velocity tensor to plain text files if requested in addition to VTK files
-         if(grid%writeTheory==-2) then
+         if(grid%writeTheory<0) then
             do k = mink(3), maxk(3)
                do j = mink(2), maxk(2)
                   do i = mink(1), maxk(1)

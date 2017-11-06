@@ -20,15 +20,15 @@
    ! Static structure factors
    writeSpectrumVTK = T
    writeAbsValue = T ! Only write absolute values of complex values to VTK file?
-   writeTheory = -2 ! Write the theoretical prediction (0 or 1) or
-      ! project discretely (-1 for vtk only, -2 for both VTK and plain text .modes output)
+   writeTheory = -2 ! project onto modes (3 for vtk only, -2 for both VTK and plain text .modes output)
    nStructureFactors = 4 ! Set to zero to turn off
    ! Compute rho-rho structure factor which is the usual S(k),
    ! and also correlations for Brownian "velocities"
    ! 1=rho-rho, 2=vx-vx, 3=vy-vy, 4=vx-vy
    structureFactorPairs = "0 1 0 1, 0 2 0 2, 0 3 0 3, 0 2 0 3"
       ! The zeros have to be here but mean nothing to us
-   vectorStructureFactor = "0 1 2 -1" ! For grouping into a tensor (>0 diag, <0 off-diag, 0=none)
+   vectorStructureFactor = "0 1 2 -1" ! For grouping correlations into a velocity covariance tensor 
+      ! (>0 diag, <0 off-diag, 0=not velocity)
    
    ! Dynamic structure factors:
    paddDynamicFFT = 0 ! -1=no padding, 0=padd with zeros, 1=padd with mirror image
