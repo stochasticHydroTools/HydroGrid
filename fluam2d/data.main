@@ -5,7 +5,10 @@
 # Chose scheme
 # quasi2D or stokesLimit2D for strictly 2D hydrodynamics
 quasi2D
+# If you want true2D it is best to also disable the RFD:
 #stokesLimit2D
+#use_RFD        0
+
 particles                               1
 
 # Default integrator is Forward-Euler, to
