@@ -1,10 +1,11 @@
 program initial
-  integer, parameter :: n=32000
+  integer, parameter :: n=8000 ! 32000
   integer, parameter :: ng=n/3
   integer :: p
   real :: x, y, Lx, Ly
   
-  Lx=453.74818583181210299
+  !Lx=453.74818583181210299
+  Lx=226.8740929
   Ly=Lx
   
   call RANDOM_SEED()

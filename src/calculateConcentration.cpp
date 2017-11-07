@@ -142,6 +142,17 @@ void calculateConcentration(string outputname,
 
     // Scale concentration and density fields (but not velocities)
     for(int i=0; i < mx*my; i++){
+      //if(density[i]>0.0) // Convert to "velocity"
+      if(0) // Don't convert to "velocity", use "momentum"
+      {
+         velocity[i] = velocity[i]/density[i];
+         velocity[mx*my+i] = velocity[mx*my+i]/density[i];
+      }
+      if(1) // Normalize by cell volume (not sure why we need to but it seems to be the right thing to do?)
+      {
+         velocity[i] = inverse_volume_cell*velocity[i];
+         velocity[mx*my+i] = inverse_volume_cell*velocity[mx*my+i];
+      }
       density[i] = inverse_volume_cell*density[i];
       c[i]       = inverse_volume_cell*c[i];
       c[mx*my+i] = inverse_volume_cell*c[mx*my+i];

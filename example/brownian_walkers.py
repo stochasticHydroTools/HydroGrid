@@ -38,12 +38,12 @@ import libCallHydroGrid as cc
 if __name__ == '__main__':
 
   # Set variables
-  num_particles = 1024
+  num_particles = 2048
   chi = 1 # Diffusion coefficient
-  nsteps = 1000 # Number of steps
+  nsteps = 5000 # Number of steps
   sample = 0 # How often to output HydroGrid statistics, if zero only output stats at the end
-  L = np.array([256.0, 256.0])
-  cells = np.array([32, 32], dtype=int)  
+  L = np.array([128.0, 128.0])
+  cells = np.array([32, 32], dtype=int)
 
   # Generate phase-separated particle configuration
   last_green = num_particles/2
@@ -53,7 +53,7 @@ if __name__ == '__main__':
   r_vectors[last_green+1:,1] = r_vectors[last_green+1:,1] * L[1]/2 + L[1]/2 # y coordinates in upper half   
   
   # Set Gaussian standard deviation along x, y and z
-  dt = L[1]*L[1]/chi/5000.0 # Time step
+  dt = L[1]*L[1]/chi/1000.0 # Time step
   dx = np.array([1.0, 1.0])*np.sqrt(2*chi*dt)
 
   print 'num_particles= ', num_particles, ' dt=', dt

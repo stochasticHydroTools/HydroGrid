@@ -2285,16 +2285,30 @@ subroutine writeStructureFactors(grid,filenameBase)
             do k = mink(3), maxk(3)
                do j = mink(2), maxk(2)
                   do i = mink(1), maxk(1)
+
+                     ijk = (/i,j,k/)
+                     kdrh = ijk * pi / grid%nCells ! This is k*dx/2
+                     k_discrete = ijk * 2*pi / grid%systemLength ! Wavenumber
+                     if(abs(grid%writeTheory)==1) then ! Account for discretization artifacts
+                        where(ijk==0)
+                           k_discrete = 0
+                        else where
+                           k_discrete = k_discrete * (sin(kdrh)/kdrh)
+                        end where
+                     end if   
+                     k2_discrete = sum(k_discrete**2)
+
                      do iMode=1, nModes
-                        write(structureFactorFile(iMode), '(g17.9)', advance="no") S_k_array(i,j,k,n_S_k_vars+iMode)
+                        !write(structureFactorFile(iMode), '(g17.9)', advance="no") S_k_array(i,j,k,n_S_k_vars+iMode)
+                        if(.not.all(ijk==0)) write(structureFactorFile(iMode), '(100g17.9)') sqrt(k2_discrete),  S_k_array(i,j,k,n_S_k_vars+iMode)
                      end do ! x 
                   end do
                   do iMode=1, nModes
-                     write(structureFactorFile(iMode), *) ! Newline
+                     !write(structureFactorFile(iMode), *) ! Newline
                   end do
                end do ! y
                do iMode=1, nModes
-                  write(structureFactorFile(iMode), *) ! Newline
+                  !write(structureFactorFile(iMode), *) ! Newline
                end do
             end do ! z
          end if
