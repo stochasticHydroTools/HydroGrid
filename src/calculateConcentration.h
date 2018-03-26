@@ -1,6 +1,6 @@
 /* Reduced C++ interface to HydroGrid for just working with concentrations/number densities of particles in Quasi2D */
 bool callHydroGrid(const int option,
-                   const string outputname,
+                   const std::string outputname,
                    double *c,
                    double *density,
                    double *velocity,
