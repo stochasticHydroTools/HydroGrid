@@ -18,6 +18,7 @@
 #include <fstream>
 #include "visit_writer.h"
 #include "visit_writer.c"
+#include "calculateConcentration.h"
 
 #include <boost/python.hpp>
 #include <math.h>
@@ -26,18 +27,6 @@
 
 namespace bp = boost::python;
 using namespace std;
-
-bool callHydroGrid(const int option,
-                   const string outputname,
-                   double *c,
-                   double *density,
-                   double *velocity,
-                   const int mx,
-                   const int my,
-                   const double lx,
-                   const double ly,
-                   const double dt,
-                   const int step);
 
 
 void calculateConcentration(string outputname,
