@@ -12,7 +12,7 @@ vpath %.f90 $(SRC_HYDROLIB)
 CHEADERS += RNGs.h visit_writer.h HydroGrid.h
 CSOURCES += RNGs.c visit_writer.c
 CXXSOURCES = callHydroGrid.cpp
-FSOURCES += Precision.f90 RNG.f90 Random.f90 NURNGs.f90 FFTW.f90 VisitWriter.f90 HydroGridModule.f90 HydroGridCInterface.f90
+FSOURCES += Precision.f90 RNGEngine.f90 RNG.f90 Random.f90 NURNGs.f90 FFTW.f90 VisitWriter.f90 HydroGridModule.f90 HydroGridCInterface.f90
 
 OBJECTS=$(CSOURCES:.c=.o) $(FSOURCES:.f90=.o) $(CXXSOURCES:.cpp=.o)
 
@@ -34,10 +34,13 @@ Precision.o: Precision.f90
 Random.o: Random.f90 Precision.o
 	$(FC) -c $<
 
-NURNGs.o: NURNGs.f90
+RNGEngine.o: RNGEngine.f90
+	$(FC) -c $<        
+
+NURNGs.o: NURNGs.f90 RNGEngine.o
 	$(FC) -c $<
 
-RNG.o: RNG.f90 Random.o NURNGs.o
+RNG.o: RNG.f90 Random.o NURNGs.o RNGEngine.o
 	$(FC) -c $<
 
 RNGs.o: RNGs.c
