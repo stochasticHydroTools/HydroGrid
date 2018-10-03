@@ -20,27 +20,28 @@
 #include "visit_writer.c"
 #include "calculateConcentration.h"
 
-#include <boost/python.hpp>
+#ifndef NOPYTHON
+   #include <boost/python.hpp>
+   namespace bp = boost::python;
+#endif
 #include <math.h>
 #include <stdio.h>
 #include <vector>
 
-namespace bp = boost::python;
 using namespace std;
 
-
 void calculateConcentration(string outputname,
-                            double lx, // Domain x length
-                            double ly, // Domain y length
-                            int green_start, // Start of "green" particles
-                            int green_end, // End of "green" particles
-                            int mx, // Grid size x
-                            int my, // Grid size y
-                            int step, // Step of simulation
-                            double dt, // Time interval between successive snapshots (calls to updateHydroGrid)
-                            int np, // Number of particles
-                            int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (save+finalize), 4 (finalize only)
-                            double *x_array, double *y_array){
+        double lx, // Domain x length
+        double ly, // Domain y length
+        int green_start, // Start of "green" particles
+        int green_end, // End of "green" particles
+        int mx, // Grid size x
+        int my, // Grid size y
+        int step, // Step of simulation
+        double dt, // Time interval between successive snapshots (calls to updateHydroGrid)
+        int np, // Number of particles
+        int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (save+finalize), 4 (finalize only)
+        double *x_array, double *y_array){
   
   static int n_calls = 0;
   static double dx, dy, inverse_volume_cell;
@@ -232,6 +233,31 @@ void calculateConcentration(string outputname,
 
 }
 
+extern "C" { // Interoperable with C and Fortran
+   void calculateConcentration_C(char *filename,
+           double lx, // Domain x length
+           double ly, // Domain y length
+           int green_start, // Start of "green" particles
+           int green_end, // End of "green" particles
+           int mx, // Grid size x
+           int my, // Grid size y
+           int step, // Step of simulation
+           double dt, // Time interval between successive snapshots (calls to updateHydroGrid)
+           int np, // Number of particles
+           int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (save+finalize), 4 (finalize only)
+           double *x_array, double *y_array){
+    string outputname(filename); // Convert to C++ string     
+    calculateConcentration(outputname,
+           lx, ly, green_start, green_end, mx, my, step,
+           dt, np, option, x_array, y_array);                            
+                            
+   }
+}
+
+// Python binding, if desired
+//-----------------------------------------------------------
+#ifndef NOPYTHON 
+
 /*
   Wrapper to call calculateConcentration from python
  */
@@ -275,3 +301,6 @@ BOOST_PYTHON_MODULE(libCallHydroGrid)
   boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
   def("calculate_concentration", calculateConcentrationPython);
 }
+
+#endif /* PYTHON */
+//-----------------------------------------------------------

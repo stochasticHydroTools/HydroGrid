@@ -25,3 +25,18 @@ void calculateConcentration(std::string outputname,
    int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (save+finalize), 4 (finalize only),
    double *x_array, double *y_array);
 
+/* This is a C/Fortran-interoperable wrapper */
+extern "C" { // Interoperable with C and Fortran
+void calculateConcentration_C(char *outputname,
+   double lx, // Domain x length
+   double ly, // Domain y length
+   int green_start, // Start of "green" particles
+   int green_end, // End of "green" particles
+   int mx, // Grid size x
+   int my, // Grid size y
+   int step, // Step of simulation
+   double dt, // Time interval between successive snapshots (calls to updateHydroGrid)
+   int np, // Number of particles
+   int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (save+finalize), 4 (finalize only),
+   double *x_array, double *y_array);
+}

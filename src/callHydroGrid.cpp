@@ -58,6 +58,7 @@ bool callHydroGrid(const int option,
                           0 /*nPassiveScalars*/,
                           1 /*structFactMultiplier*/,
                           1 /*project2D*/);
+
   }
   else if(option == 1){
     updateHydroAnalysisMixture_C(velocity /*velocities*/, density /*densities*/, c /*concentrations*/);
