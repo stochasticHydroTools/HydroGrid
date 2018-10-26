@@ -22,7 +22,9 @@
 
 #ifndef NOPYTHON
    #include <boost/python.hpp>
+   #include <boost/python/numpy.hpp>
    namespace bp = boost::python;
+   namespace np = boost::python::numpy;
 #endif
 #include <math.h>
 #include <stdio.h>
@@ -31,17 +33,17 @@
 using namespace std;
 
 void calculateConcentration(string outputname,
-        double lx, // Domain x length
-        double ly, // Domain y length
-        int green_start, // Start of "green" particles
-        int green_end, // End of "green" particles
-        int mx, // Grid size x
-        int my, // Grid size y
-        int step, // Step of simulation
-        double dt, // Time interval between successive snapshots (calls to updateHydroGrid)
-        int np, // Number of particles
-        int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (save+finalize), 4 (finalize only)
-        double *x_array, double *y_array){
+                            double lx,       // Domain x length
+                            double ly,       // Domain y length
+                            int green_start, // Start of "green" particles
+                            int green_end,   // End of "green" particles
+                            int mx,          // Grid size x
+                            int my,          // Grid size y
+                            int step,        // Step of simulation
+                            double dt,       // Time interval between successive snapshots (calls to updateHydroGrid)
+                            int np,          // Number of particles
+                            int option,      // option = 0 (initialize), 1 (update), 2 (save), 3 (save+finalize), 4 (finalize only)
+                            double *x_array, double *y_array){
   
   static int n_calls = 0;
   static double dx, dy, inverse_volume_cell;
@@ -262,43 +264,44 @@ extern "C" { // Interoperable with C and Fortran
   Wrapper to call calculateConcentration from python
  */
 void calculateConcentrationPython(string outputname,
-                            double lx, 
-                            double ly, 
-                            int green_start,
-                            int green_end,
-                            int mx,
-                            int my,
-                            int step,
-                            double dt,
-                            int np,
-                            int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (finalize)
-                            bp::numeric::array r_vectors) // Should be an Nx3 numpy array
+                                  double lx, 
+                                  double ly, 
+                                  int green_start,
+                                  int green_end,
+                                  int mx,
+                                  int my,
+                                  int step,
+                                  double dt,
+                                  int np,
+                                  int option, // option = 0 (initialize), 1 (update), 2 (save), 3 (finalize)
+                                  /*bp::numeric::array r_vectors*/
+                                  np::ndarray r_vectors_np) // Should be an Nx3 numpy array
 {
-
-   double* x = new double [np];
-   double* y = new double [np];
-   
-   for(int i=0;i<np;i++){
-      // Extract data
-      bp::numeric::array r_vector_1 = bp::extract<bp::numeric::array>(r_vectors[i]);
-      x[i] = bp::extract<double>(r_vector_1[0]);     
-      y[i] = bp::extract<double>(r_vector_1[1]);     
   
+  double *r_vectors = reinterpret_cast<double *>(r_vectors_np.get_data());
+  double* x = new double [np];
+  double* y = new double [np];
+  
+  for(int i=0;i<np;i++){
+    // Extract data
+    x[i] = r_vectors[3*i + 0];
+    y[i] = r_vectors[3*i + 1];
   }    
-         
-   calculateConcentration(outputname, lx, ly, 
-                            green_start, green_end, mx, my, step,
-                            dt, np, option, x, y);
-                            
-   delete[] x;
-   delete[] y;                            
-                            
+  
+  calculateConcentration(outputname, lx, ly, 
+                         green_start, green_end, mx, my, step,
+                         dt, np, option, x, y);  
+  delete[] x;
+  delete[] y;                           
 }
 
 BOOST_PYTHON_MODULE(libCallHydroGrid)
 {
   using namespace boost::python;
-  boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
+
+  // Initialize numpy
+  Py_Initialize();
+  np::initialize();
   def("calculate_concentration", calculateConcentrationPython);
 }
 
