@@ -38,7 +38,7 @@ import libCallHydroGrid as cc
 if __name__ == '__main__':
 
   # Set variables
-  output_name = 'data/run'
+  output_name = 'run'
   num_particles = 2048
   chi = 1 # Diffusion coefficient
   nsteps = 5000 # Number of steps
@@ -54,7 +54,7 @@ if __name__ == '__main__':
   r_vectors[last_green+1:,1] = r_vectors[last_green+1:,1] * L[1]/2 + L[1]/2 # y coordinates in upper half   
   
   # Set Gaussian standard deviation along x, y and z
-  dt = L[1]*L[1]/chi/1000000.0 # Time step
+  dt = L[1]*L[1]/chi/1000.0 # Time step
   dx = np.array([1.0, 1.0])*np.sqrt(2*chi*dt)
 
   print('num_particles= ', num_particles, ' dt=', dt)

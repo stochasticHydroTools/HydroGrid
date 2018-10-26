@@ -48,7 +48,7 @@ RNGs.o: RNGs.c
 
 SeedRNGs.o: SeedRNGs.cpp RNGs.h
 	$(CPPC) -I $(MPIINC) -c $<
-                        
+
 visit_writer.o: visit_writer.c
 	$(CC) -c $<
 
@@ -63,7 +63,7 @@ HydroGridModule.o: HydroGridModule.f90 FFTW.o VisitWriter.o
 
 HydroGridCInterface.o: HydroGridCInterface.f90 HydroGridModule.o
 	$(FC) -c $<
-        
+
 calculateConcentration.o: calculateConcentration.cpp
 	$(CXX) -I$(PYTHON_INCLUDE) -I$(BOOST_INC) -fPIC -c $<
 
@@ -73,5 +73,6 @@ callHydroGrid.o: callHydroGrid.cpp
 libCallHydroGrid.a: callHydroGrid.o calculateConcentration.o 
 	ar rcs libCallHydroGrid.a callHydroGrid.o calculateConcentration.o
 
+# -lboost_numpy
 libCallHydroGrid.so: calculateConcentration.o callHydroGrid.o libHydroAnalysis.a
-	$(CXX) -shared -dynamiclib -O3 calculateConcentration.o callHydroGrid.o -L$(BOOST_LIB) -lboost_python -L$(PYTHON_LIB) -lpython$(PYTHON_VERSION) -L./ -lHydroAnalysis $(LIBRARIES) -o libCallHydroGrid.so
+	$(CXX) -shared -dynamiclib -O3 calculateConcentration.o callHydroGrid.o -L$(BOOST_LIB) -lboost_python -lboost_numpy -L$(PYTHON_LIB) -lpython$(PYTHON_VERSION) -L./ -lHydroAnalysis $(LIBRARIES) -o libCallHydroGrid.so

@@ -277,15 +277,19 @@ void calculateConcentrationPython(string outputname,
                                   /*bp::numeric::array r_vectors*/
                                   np::ndarray r_vectors_np) // Should be an Nx3 numpy array
 {
-  
+
+  int dims = r_vectors_np.get_nd();
+  int size = r_vectors_np.shape(0) * dims;
+  int stride = size / np;
   double *r_vectors = reinterpret_cast<double *>(r_vectors_np.get_data());
+  
   double* x = new double [np];
   double* y = new double [np];
   
   for(int i=0;i<np;i++){
     // Extract data
-    x[i] = r_vectors[3*i + 0];
-    y[i] = r_vectors[3*i + 1];
+    x[i] = r_vectors[stride*i + 0];
+    y[i] = r_vectors[stride*i + 1];
   }    
   
   calculateConcentration(outputname, lx, ly, 

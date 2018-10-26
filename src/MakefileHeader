@@ -53,3 +53,4 @@ PYTHON_LIB = $(PYTHON_DIR)/lib/
 # location of the Boost Python include files and library
 BOOST_INC = /usr/include/boost
 BOOST_LIB = /usr/lib64/boost
+# LIBRARIES += -Wl,-rpath=/path/to/libboost_python.so 
