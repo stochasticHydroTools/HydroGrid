@@ -278,8 +278,14 @@ void calculateConcentrationPython(string outputname,
                                   np::ndarray r_vectors_np) // Should be an Nx3 numpy array
 {
 
+  int size;
   int dims = r_vectors_np.get_nd();
-  int size = r_vectors_np.shape(0) * dims;
+  if(dims == 1){
+    size = r_vectors_np.shape(0);
+  }
+  else{
+    size = r_vectors_np.shape(0) * r_vectors_np.shape(1);
+  }
   int stride = size / np;
   double *r_vectors = reinterpret_cast<double *>(r_vectors_np.get_data());
   
